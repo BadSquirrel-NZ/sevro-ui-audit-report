@@ -35,11 +35,15 @@ button:focus-visible { outline: 3px solid rgba(198,243,91,.5); outline-offset: 2
 .app-frame.transition-forward .screen { animation: screen-in-forward .35s cubic-bezier(.22,.8,.25,1) both; }
 .app-frame.transition-back .screen { animation: screen-in-back .35s cubic-bezier(.22,.8,.25,1) both; }
 .app-frame.transition-tab .screen { animation: screen-in-tab .24s ease-out both; }
+.app-frame.transition-exercise-complete .screen { animation: exercise-complete .55s cubic-bezier(.22,.8,.25,1) both; }
+.app-frame.transition-exercise-next .screen { animation: exercise-next .55s cubic-bezier(.22,.8,.25,1) both; }
 @keyframes screen-in-forward { from { opacity:.35; transform:translateX(24px); } to { opacity:1; transform:translateX(0); } }
 @keyframes screen-in-back { from { opacity:.35; transform:translateX(-24px); } to { opacity:1; transform:translateX(0); } }
 @keyframes screen-in-tab { from { opacity:.55; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes exercise-complete { 0% { opacity:1; transform:scale(1); } 45% { opacity:.92; transform:scale(.985); } 100% { opacity:.28; transform:scale(.97) translateX(-18px); } }
+@keyframes exercise-next { from { opacity:.25; transform:translateX(34px) scale(.98); } 65% { opacity:1; transform:translateX(-3px) scale(1.005); } to { opacity:1; transform:translateX(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) {
-  .app-frame.transition-forward .screen, .app-frame.transition-back .screen, .app-frame.transition-tab .screen, .history-details, .overview-exercise-details, .split-accordion-content, .builder-row-details { animation:none!important; transition:none!important; }
+  .app-frame.transition-forward .screen, .app-frame.transition-back .screen, .app-frame.transition-tab .screen, .app-frame.transition-exercise-complete .screen, .app-frame.transition-exercise-next .screen, .history-details, .overview-exercise-details, .split-accordion-content, .builder-row-details { animation:none!important; transition:none!important; }
 }
 .screen { min-height: 100dvh; padding: max(18px, env(safe-area-inset-top)) 18px calc(102px + var(--safe-b)); }
 .screen.live { padding-bottom: calc(116px + var(--safe-b)); }

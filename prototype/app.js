@@ -292,8 +292,15 @@ function logSet(si, values){
   s.weight=values?.weight??s.targetWeight;s.reps=values?.reps??s.targetReps;s.outcome=s.warmup?'calibration':values?'performed':'hit';s.pr=!s.warmup&&s.weight>80;
   haptic('setLogged');
   if(state.restTimers) startRest(s.restDuration??ex.restDuration); else {clearInterval(state.restTimer);state.rest=0;}
-  if(ex.sets.every(x=>x.outcome)&&state.liveIndex<state.live.length-1)setTimeout(()=>{state.liveIndex++;render()},700);
-  toast(s.warmup?'Warm-up recorded':`${weightText(s.weight)} × ${s.reps} recorded`);render();
+  const advancesToNext=ex.sets.every(x=>x.outcome)&&state.liveIndex<state.live.length-1;
+  toast(s.warmup?'Warm-up recorded':`${weightText(s.weight)} × ${s.reps} recorded`);
+  if(advancesToNext){
+    state.transition='exercise-complete';
+    render();
+    setTimeout(()=>{state.liveIndex++;state.transition='exercise-next';render()},650);
+    return;
+  }
+  render();
 }
 function syncRestDivider(){const ex=state.live[state.liveIndex],next=ex?.sets.findIndex(s=>!s.outcome)??-1,dividers=$$('.set-rest-divider');dividers.forEach((d,i)=>{const span=d.querySelector('span');if(!span)return;const active=state.rest>0&&i===next-1;const completed=!active&&!!ex?.sets[i]?.outcome;d.classList.toggle('active',active);d.classList.toggle('completed',completed);if(active){span.textContent=fmt(state.rest);d.setAttribute('aria-label',`${fmt(state.rest)} rest remaining`)}else if(completed){span.textContent='';d.setAttribute('aria-label','Rest complete')}else d.setAttribute('aria-label',`${span.textContent} rest`)});}
 function syncRestAction(){const row=$('[data-rest-action]'),buttons=$$('[data-rest-action] .rest-adjust');if(!row)return;const pct=Math.max(0,state.restTotal?state.rest/state.restTotal*100:0);row.style.setProperty('--rest-progress',`${pct}%`);buttons.forEach((button,i)=>button.classList.toggle('on-fill',pct>(i/buttons.length)*100));}
