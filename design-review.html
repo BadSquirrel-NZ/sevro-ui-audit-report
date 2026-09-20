@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Sevro — iOS Product Design Review</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #0a84ff;
+      --accent-soft: rgba(10,132,255,.10);
+      --ink: #111318;
+      --muted: #5f6672;
+      --canvas: #f4f5f7;
+      --paper: #ffffff;
+      --paper-2: #f8f9fb;
+      --line: #dfe2e7;
+      --critical: #b42318;
+      --high: #c2410c;
+      --medium: #8a5a00;
+      --polish: #52606d;
+      --radius: 18px;
+      --shadow: 0 16px 44px rgba(30,38,52,.08);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #f5f5f7;
+        --muted: #a8adb6;
+        --canvas: #090a0c;
+        --paper: #15171a;
+        --paper-2: #1b1e22;
+        --line: #30343a;
+        --critical: #ff8a80;
+        --high: #ffad70;
+        --medium: #e9c46a;
+        --polish: #aeb7c2;
+        --shadow: none;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font-size: 16px; line-height: 1.55; }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    button { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .cover { min-height: 78vh; display: grid; align-content: center; padding: 80px 0 64px; }
+    .cover-grid { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(260px,.6fr); gap: 72px; align-items: end; }
+    .mark { display: inline-grid; width: 52px; height: 52px; place-items: center; margin-bottom: 38px; border-radius: 14px; background: var(--accent); color: white; }
+    .mark svg { width: 29px; height: 29px; }
+    .kicker { margin: 0 0 12px; color: var(--accent); font-size: .78rem; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; }
+    h1 { max-width: 820px; margin: 0; font-size: clamp(3rem, 8vw, 6.5rem); line-height: .92; letter-spacing: -.065em; }
+    .dek { max-width: 760px; margin: 34px 0 0; color: var(--muted); font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.45; }
+    .meta { padding: 24px 0 2px; border-top: 1px solid var(--line); }
+    .meta dt { margin-top: 14px; color: var(--muted); font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .meta dd { margin: 3px 0 0; font-weight: 650; }
+    main { padding-bottom: 96px; }
+    section { margin-top: 88px; }
+    .section-head { display: grid; grid-template-columns: 130px minmax(0,1fr); gap: 24px; align-items: baseline; margin-bottom: 28px; }
+    .section-num { color: var(--accent); font-size: .8rem; font-weight: 800; letter-spacing: .12em; }
+    h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.35rem); line-height: 1; letter-spacing: -.045em; }
+    h3 { margin: 0; font-size: 1.14rem; letter-spacing: -.018em; }
+    p { margin: 0; }
+    .lede { max-width: 780px; margin: -10px 0 32px 154px; color: var(--muted); font-size: 1.05rem; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); box-shadow: var(--shadow); }
+    .scorecard { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); overflow: hidden; }
+    .score { min-height: 230px; padding: 24px; border-right: 1px solid var(--line); }
+    .score:last-child { border-right: 0; }
+    .score .letter { color: var(--accent); font-size: .76rem; font-weight: 800; }
+    .score strong { display: block; margin-top: 20px; font-size: 2.6rem; line-height: 1; letter-spacing: -.05em; }
+    .score strong span { color: var(--muted); font-size: 1rem; }
+    .score h3 { margin-top: 13px; }
+    .score p { margin-top: 8px; color: var(--muted); font-size: .88rem; line-height: 1.45; }
+    .meter { height: 4px; margin-top: 20px; overflow: hidden; border-radius: 99px; background: var(--line); }
+    .meter i { display: block; height: 100%; width: var(--w); background: var(--accent); }
+    .verdict { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; overflow: hidden; background: var(--line); }
+    .verdict > div { min-height: 150px; padding: 24px; background: var(--paper); }
+    .verdict span { color: var(--muted); font-size: .76rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .verdict strong { display: block; margin-top: 7px; font-size: 1.2rem; line-height: 1.35; }
+    .top-five { counter-reset: top; display: grid; gap: 10px; }
+    .top-item { counter-increment: top; display: grid; grid-template-columns: 60px minmax(0,1fr) auto; gap: 20px; align-items: start; padding: 22px 24px; }
+    .top-item::before { content: counter(top, decimal-leading-zero); color: var(--accent); font-size: 1.6rem; font-weight: 800; letter-spacing: -.04em; }
+    .top-item p { margin-top: 5px; color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; min-height: 27px; padding: 4px 9px; border: 1px solid currentColor; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; white-space: nowrap; }
+    .critical { color: var(--critical); }
+    .high { color: var(--high); }
+    .medium { color: var(--medium); }
+    .polish { color: var(--polish); }
+    .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .inventory-card { padding: 24px; }
+    .inventory-card.wide { grid-column: 1/-1; }
+    .inventory-card h3 { margin-bottom: 15px; }
+    .compact-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .compact-list li { display: grid; grid-template-columns: 132px 1fr; gap: 12px; padding-top: 9px; border-top: 1px solid var(--line); }
+    .compact-list li:first-child { padding-top: 0; border-top: 0; }
+    .compact-list strong { font-size: .9rem; }
+    .compact-list span { color: var(--muted); font-size: .88rem; }
+    .state-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .state { min-height: 116px; padding: 16px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper-2); }
+    .state b { display: block; font-size: .88rem; }
+    .state p { margin-top: 6px; color: var(--muted); font-size: .8rem; }
+    .state.missing { border-color: color-mix(in srgb, var(--high) 45%, var(--line)); }
+    .state.missing b::after { content: "Missing"; float: right; color: var(--high); font-size: .65rem; letter-spacing: .05em; text-transform: uppercase; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+    .filter { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--muted); cursor: pointer; }
+    .filter[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 750; }
+    .result-count { margin-left: auto; align-self: center; color: var(--muted); font-size: .84rem; }
+    .table-shell { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 13px 16px; background: var(--paper-2); color: var(--muted); font-size: .72rem; letter-spacing: .07em; text-align: left; text-transform: uppercase; }
+    td { vertical-align: top; padding: 20px 16px; border-top: 1px solid var(--line); }
+    .findings th:nth-child(1) { width: 68px; }
+    .findings th:nth-child(2) { width: 25%; }
+    .findings th:nth-child(4) { width: 122px; }
+    .axis-row td { padding: 25px 16px 10px; background: var(--paper-2); color: var(--accent); font-size: .76rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .finding-id { color: var(--accent); font-weight: 850; }
+    .finding-title { margin-bottom: 7px; font-weight: 750; }
+    .location { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .76rem; overflow-wrap: anywhere; }
+    .detail { display: grid; gap: 11px; font-size: .9rem; }
+    .detail b { color: var(--ink); }
+    .detail p { color: var(--muted); }
+    .detail .translation { padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--ink); }
+    .priority { display: grid; gap: 8px; justify-items: start; }
+    .effort { color: var(--muted); font-size: .78rem; font-weight: 750; }
+    .additions { display: grid; gap: 12px; }
+    .addition { display: grid; grid-template-columns: 70px 1.15fr 1fr 120px; gap: 18px; padding: 22px 24px; }
+    .rank { color: var(--accent); font-size: 1.7rem; font-weight: 850; }
+    .addition p { margin-top: 5px; color: var(--muted); font-size: .88rem; }
+    .native { font-size: .88rem; }
+    .native code, code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82em; }
+    .effort-box { justify-self: end; text-align: right; }
+    .effort-box strong { display: block; font-size: 1.15rem; }
+    .effort-box span { color: var(--muted); font-size: .75rem; }
+    .not-recommending { margin-top: 22px; padding: 24px; }
+    .not-recommending ul { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; margin: 16px 0 0; padding-left: 20px; color: var(--muted); }
+    .roadmap { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .wave { padding: 24px; }
+    .wave .wave-num { color: var(--accent); font-size: .74rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .wave h3 { margin-top: 8px; font-size: 1.45rem; }
+    .wave ul { margin: 16px 0 0; padding-left: 20px; color: var(--muted); }
+    .wave li + li { margin-top: 8px; }
+    .sources { padding: 24px; }
+    .sources p { color: var(--muted); font-size: .83rem; }
+    .sources p + p { margin-top: 10px; }
+    footer { margin-top: 88px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+    [hidden] { display: none !important; }
+    @media (max-width: 920px) {
+      .cover-grid { grid-template-columns: 1fr; gap: 36px; }
+      .scorecard { grid-template-columns: 1fr 1fr; }
+      .score { border-bottom: 1px solid var(--line); }
+      .score:nth-child(2n) { border-right: 0; }
+      .score:last-child { grid-column: 1/-1; }
+      .state-grid { grid-template-columns: 1fr 1fr; }
+      .addition { grid-template-columns: 55px 1fr; }
+      .addition .native, .addition .effort-box { grid-column: 2; justify-self: start; text-align: left; }
+      .roadmap { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .wrap { width: min(100% - 24px, 1160px); }
+      .cover { min-height: auto; padding-top: 48px; }
+      .section-head { grid-template-columns: 1fr; gap: 7px; }
+      .lede { margin-left: 0; }
+      .scorecard, .verdict, .inventory-grid { grid-template-columns: 1fr; }
+      .score, .score:nth-child(2n) { border-right: 0; border-bottom: 1px solid var(--line); }
+      .verdict > div { min-height: auto; }
+      .inventory-card.wide { grid-column: auto; }
+      .top-item { grid-template-columns: 44px 1fr; }
+      .top-item .pill { grid-column: 2; justify-self: start; }
+      .state-grid { grid-template-columns: 1fr; }
+      .result-count { width: 100%; margin-left: 0; }
+      .table-shell { overflow: visible; border: 0; box-shadow: none; background: transparent; }
+      .findings thead { display: none; }
+      .findings, .findings tbody, .findings tr, .findings td { display: block; width: 100%; }
+      .findings tr.finding-row { margin-bottom: 12px; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+      .findings td { border: 0; padding: 8px 16px; }
+      .findings td:first-child { padding-top: 18px; }
+      .findings td:last-child { padding-bottom: 18px; }
+      .axis-row td { margin: 24px 0 8px; padding: 0; background: transparent; }
+      .compact-list li { grid-template-columns: 1fr; gap: 2px; }
+      .not-recommending ul { grid-template-columns: 1fr; }
+    }
+    @media print {
+      @page { size: A4; margin: 15mm; }
+      :root { color-scheme: light; --ink:#111318; --muted:#5f6672; --canvas:#fff; --paper:#fff; --paper-2:#f6f7f9; --line:#d8dce2; --shadow:none; }
+      body { background:#fff; font-size: 9.5pt; }
+      .wrap { width: 100%; }
+      .cover { min-height: 245mm; padding: 20mm 0; break-after: page; }
+      .cover-grid { grid-template-columns: 1.4fr .6fr; }
+      h1 { font-size: 52pt; }
+      section { margin-top: 14mm; }
+      .filters { display: none; }
+      .panel, .finding-row, .addition, .wave, .inventory-card { break-inside: avoid; box-shadow: none; }
+      .scorecard { grid-template-columns: repeat(5,1fr); }
+      .score { min-height: 48mm; padding: 4mm; }
+      .score strong { font-size: 24pt; }
+      .score p { font-size: 8pt; }
+      .findings th, .findings td { padding: 3mm; }
+      .finding-row[hidden] { display: table-row !important; }
+      .axis-row[hidden] { display: table-row !important; }
+      .addition { grid-template-columns: 12mm 1.1fr 1fr 24mm; }
+      .roadmap { grid-template-columns: repeat(3,1fr); }
+      a { color:#111318; text-decoration:none; }
+      footer { margin-top: 14mm; }
+    }
+  </style>
+</head>
+<body>
+  <header class="cover">
+    <div class="wrap cover-grid">
+      <div>
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M5 12h5v8H5V12Zm17 0h5v8h-5v-8ZM2 14h3v4H2v-4Zm25 0h3v4h-3v-4Zm-17 1h12v2H10v-2Z" fill="currentColor"/></svg>
+        </div>
+        <p class="kicker">iOS 26 product design review</p>
+        <h1>Sevro</h1>
+        <p class="dek">A strength-training utility for gym-goers to plan workouts, log sets and rest periods, and understand progress over time. The prototype has a credible, fast core loop, but it is not yet at Apple first-party quality because resilience, reachable information architecture, accessibility semantics, and native-system translation still have ship-blocking gaps.</p>
+      </div>
+      <dl class="meta">
+        <dt>Review date</dt><dd>21 September 2026</dd>
+        <dt>Source reviewed</dt><dd>Prototype commit 0295dbc</dd>
+        <dt>Target</dt><dd>SwiftUI · iOS 26</dd>
+        <dt>Runtime evidence</dt><dd>375 × 812 pt, default and simulated accessibility text</dd>
+        <dt>Scope</dt><dd>Product design, accessibility, native translation</dd>
+      </dl>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="verdict">
+      <div class="section-head"><span class="section-num">01 / VERDICT</span><h2>Promising core. Incomplete product.</h2></div>
+      <div class="panel verdict">
+        <div><span>What works</span><strong>Starting and logging a workout is direct, with clear targets, immediate feedback, rest controls, and stable top-level navigation.</strong></div>
+        <div><span>What blocks ship</span><strong>An interrupted workout is lost; several product areas are unreachable; and critical accessibility and state coverage remain incomplete.</strong></div>
+        <div><span>Decision</span><strong>Do not translate screen-for-screen. Preserve the content model, then rebuild the shell and semantics with native SwiftUI components.</strong></div>
+      </div>
+    </section>
+
+    <section id="scorecard">
+      <div class="section-head"><span class="section-num">02 / SCORECARD</span><h2>Apple-grade assessment</h2></div>
+      <div class="panel scorecard">
+        <article class="score"><span class="letter">A</span><strong>3<span>/5</span></strong><h3>Visual polish</h3><p>Hierarchy is strong, but contrast failures, oversized editorial cards, bespoke effects, and non-SF iconography keep it from system-level restraint.</p><div class="meter"><i style="--w:60%"></i></div></article>
+        <article class="score"><span class="letter">B</span><strong>3<span>/5</span></strong><h3>Interaction &amp; motion</h3><p>Set logging feels responsive and Reduce Motion exists, but gesture-only editing, custom transitions, and an unsafe zero-set finish path remain.</p><div class="meter"><i style="--w:60%"></i></div></article>
+        <article class="score"><span class="letter">C</span><strong>2<span>/5</span></strong><h3>Architecture &amp; flow</h3><p>The four-tab model is coherent, yet unreachable profile and goal routes, seeded first-run data, and no completion summary make the product feel unfinished.</p><div class="meter"><i style="--w:40%"></i></div></article>
+        <article class="score"><span class="letter">D</span><strong>3<span>/5</span></strong><h3>Accessibility</h3><p>Touch targets, modal focus, and reduced-motion paths are good; contrast, VoiceOver chatter, decorative announcements, and custom semantics are not.</p><div class="meter"><i style="--w:60%"></i></div></article>
+        <article class="score"><span class="letter">E</span><strong>2<span>/5</span></strong><h3>Platform integration</h3><p>The prototype expresses app-like utility, but durable session state, native file flows, system containers, localization, and iOS surfaces are absent.</p><div class="meter"><i style="--w:40%"></i></div></article>
+      </div>
+    </section>
+
+    <section id="top-five">
+      <div class="section-head"><span class="section-num">03 / PRIORITY</span><h2>Top five if nothing else gets done</h2></div>
+      <div class="top-five">
+        <article class="panel top-item"><div><h3>E1 · Persist every live-workout mutation</h3><p>Reloading or termination currently erases the active session, elapsed time, completed sets, and rest state.</p></div><span class="pill critical">Critical</span></article>
+        <article class="panel top-item"><div><h3>A1 · Replace failing custom colour pairs</h3><p>Several 12–15 pt labels and destructive controls measure between 2.68:1 and 3.96:1, below 4.5:1.</p></div><span class="pill high">High</span></article>
+        <article class="panel top-item"><div><h3>B1 · Remove gesture-only editing</h3><p>Tracked bests, per-muscle targets, and builder reordering depend on long press or drag without a complete visible alternative.</p></div><span class="pill high">High</span></article>
+        <article class="panel top-item"><div><h3>C1 · Make profile, goals, and progress routes reachable</h3><p>Implemented screens and editors exist in code but have no path from the rendered Settings or Insights hierarchy.</p></div><span class="pill high">High</span></article>
+        <article class="panel top-item"><div><h3>D1 · Stop announcing the rest timer every second</h3><p>The live region updates continuously and can monopolise VoiceOver while the user is trying to log or edit the next set.</p></div><span class="pill high">High</span></article>
+      </div>
+    </section>
+
+    <section id="inventory">
+      <div class="section-head"><span class="section-num">04 / INVENTORY</span><h2>What exists</h2></div>
+      <p class="lede">Inventory is based on rendered routes, state branches, overlay builders, and event bindings in <code>prototype/app.js</code>. “Unreachable” means the code exists but no rendered control links to it.</p>
+      <div class="inventory-grid">
+        <article class="panel inventory-card">
+          <h3>Screens and routes</h3>
+          <ul class="compact-list">
+            <li><strong>Home</strong><span>Default “Today’s workout” and active-session Resume state; weekly volume and strength cards.</span></li>
+            <li><strong>Workouts</strong><span>Browse, edit mode, active split, collapsed/expanded history, start and detail actions.</span></li>
+            <li><strong>Workout detail</strong><span>Exercise summary, Start workout, Edit workout.</span></li>
+            <li><strong>Workout builder</strong><span>New/edit, empty/populated, disabled save, counters, remove and reorder.</span></li>
+            <li><strong>Split builder</strong><span>Weekday/numbered modes, assignment selectors, active split editing.</span></li>
+            <li><strong>Live workout</strong><span>Exercise/Overview modes; planned, next, logged, missed, skipped, resting, exercise-complete and finish states.</span></li>
+            <li><strong>Insights</strong><span>Default strength/volume/bests state and active-workout exercise progress state.</span></li>
+            <li><strong>Settings</strong><span>Appearance, accent, units, rest timers, export and restore.</span></li>
+            <li><strong>Profile</strong><span>Implemented but unreachable.</span></li>
+            <li><strong>Goals</strong><span>Implemented but unreachable.</span></li>
+            <li><strong>Personal Bests</strong><span>Implemented but unreachable as a dedicated route.</span></li>
+            <li><strong>Exercise progress</strong><span>Implemented but reachable only through the unreachable Personal Bests route.</span></li>
+          </ul>
+        </article>
+        <article class="panel inventory-card">
+          <h3>Reusable components and overlays</h3>
+          <ul class="compact-list">
+            <li><strong>Shell</strong><span>Custom app frame, top headers, bottom tab bar, back header.</span></li>
+            <li><strong>Cards and rows</strong><span>Content cards, list rows, workout cards, metric/stat cards, set rows, overview cards.</span></li>
+            <li><strong>Controls</strong><span>Primary/secondary/ghost buttons, segmented controls, chips, steppers, counters, custom switch, colour swatches.</span></li>
+            <li><strong>Feedback</strong><span>Status live region, press animation, set confirmation, haptic abstraction, rest countdown, progress bars.</span></li>
+            <li><strong>Charts</strong><span>Strength line chart/scrubber, volume bars, goal progress, circular strength score.</span></li>
+            <li><strong>Sheets</strong><span>Standard splits, split preview, exercise picker, previous session, live add exercise, set editor, swap, profile editor, goal type/target, volume help, restore.</span></li>
+            <li><strong>Dialogs</strong><span>Finish workout and delete workout.</span></li>
+          </ul>
+        </article>
+        <article class="panel inventory-card wide">
+          <h3>State coverage</h3>
+          <div class="state-grid">
+            <div class="state"><b>Default / populated</b><p>Strong coverage across all primary screens.</p></div>
+            <div class="state"><b>Active / completed workout</b><p>Active, resting, skipped, missed, complete, partial finish and discard states exist.</p></div>
+            <div class="state"><b>Disabled</b><p>Builder saves, picker Done, and movement controls expose disabled states.</p></div>
+            <div class="state"><b>Long content</b><p>375 × 812 pt and simulated accessibility text showed no horizontal overflow.</p></div>
+            <div class="state"><b>Dark / light</b><p>Both themes and system-following choice exist; Reduce Motion, Contrast and Transparency CSS paths exist.</p></div>
+            <div class="state missing"><b>First run</b><p>No honest new-user state; seeded history and goals appear immediately.</p></div>
+            <div class="state missing"><b>Empty collections</b><p>No workouts/history/goals empty experiences; exercise search can become blank.</p></div>
+            <div class="state missing"><b>Loading</b><p>No loading or importing state for restore, export, sync, or initial data hydration.</p></div>
+            <div class="state missing"><b>Error / recovery</b><p>No file, persistence, validation, sync, or import failure UI with retry.</p></div>
+            <div class="state missing"><b>Offline / stale / conflict</b><p>No model for restored data, cloud conflicts, stale summaries, or sync status.</p></div>
+            <div class="state missing"><b>No permission</b><p>Not currently applicable; must be added if notifications, HealthKit, or Live Activities request access.</p></div>
+            <div class="state missing"><b>Localization / RTL</b><p>Only English, hard-coded dates and direction-specific gestures are represented.</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="findings">
+      <div class="section-head"><span class="section-num">05 / FINDINGS</span><h2>Full critique</h2></div>
+      <div class="filters" aria-label="Filter findings by severity">
+        <button class="filter" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter" data-filter="Critical" aria-pressed="false">Critical</button>
+        <button class="filter" data-filter="High" aria-pressed="false">High</button>
+        <button class="filter" data-filter="Medium" aria-pressed="false">Medium</button>
+        <button class="filter" data-filter="Polish" aria-pressed="false">Polish</button>
+        <span class="result-count" aria-live="polite">21 findings</span>
+      </div>
+      <div class="panel table-shell">
+        <table class="findings">
+          <thead><tr><th>ID</th><th>Finding &amp; location</th><th>Observation, change, SwiftUI translation</th><th>Priority</th></tr></thead>
+          <tbody data-axis="A">
+            <tr class="axis-row"><td colspan="4">A · Visual polish — 3/5</td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">A1</td><td><div class="finding-title">Custom colours fail text contrast</div><div class="location">prototype/styles.css · .focus-workout span, .editorial-copy small, .insight-score strong, .insight-change, .set-row.missed .set-copy span, .secondary.danger</div></td><td><div class="detail"><p><b>What’s wrong.</b> Measured source pairs include 3.39:1, 3.64:1, 3.63:1, 3.40:1, 3.27:1 and 2.68:1 respectively on their light surfaces; the affected labels are 12–15 pt, so they miss 4.5:1.</p><p><b>Recommended change.</b> Replace fixed decorative colours with semantic roles; target ≥4.5:1 in both appearances and ≥7:1 where practical. Darken light-mode green/blue/red labels and verify every custom accent against its actual surface.</p><p class="translation"><b>SwiftUI note.</b> Use <code>Color.primary</code>, <code>.secondary</code>, <code>.tint</code>, and asset-catalog variants for custom roles; test Increase Contrast. Source: <a href="https://developer.apple.com/design/human-interface-guidelines/accessibility">HIG Accessibility</a>.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">A2</td><td><div class="finding-title">Dynamic Type is simulated, not modelled</div><div class="location">prototype/styles.css · :root --type-*, html[data-text-size="large"], html[data-text-size="accessibility"]</div></td><td><div class="detail"><p><b>What’s wrong.</b> The prototype collapses iOS typography into default, large, and one accessibility bucket using fixed rem tokens. Runtime at 375 × 812 showed no horizontal overflow, which is good, but it does not prove every category through accessibility5 or Bold Text.</p><p><b>Recommended change.</b> Map each role to an Apple text style, allow multiline labels, and switch dense horizontal groups to vertical layouts from accessibility1 upward.</p><p class="translation"><b>TRANSLATION RISK.</b> Do not port the rem table. Use <code>.font(.body)</code>, <code>.headline</code>, <code>.title2</code>, <code>@ScaledMetric</code>, and test <code>DynamicTypeSize.accessibility5</code>. Source: <a href="https://developer.apple.com/documentation/swiftui/dynamictypesize">DynamicTypeSize</a>.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">A3</td><td><div class="finding-title">Surface styling is too bespoke for a utility</div><div class="location">prototype/styles.css · .screen, .home-editorial-card, .insight-hero, .workout-select-card, .bottom-nav, .sheet</div></td><td><div class="detail"><p><b>What’s wrong.</b> Multiple radial gradients, translucent card layers, 22–29 px radii, colour-mixed shadows, and custom blurred bars compete for attention. The hierarchy reads, but the total treatment feels designed-on rather than system-owned.</p><p><b>Recommended change.</b> Keep one content-card radius (16–20 pt), one low elevation, opaque grouped backgrounds under Reduce Transparency, and reserve material for navigation/presentation chrome.</p><p class="translation"><b>TRANSLATION RISK.</b> Use native bars and system materials; do not reproduce CSS backdrop filters or the custom “glass” stack. Source: <a href="https://developer.apple.com/documentation/technologyoverviews/liquid-glass">Liquid Glass</a>.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">A4</td><td><div class="finding-title">Icon language mixes custom SVG and text glyphs</div><div class="location">prototype/app.js · icon(), mainNav(), settings(), workouts(), insights(); selectors .glyph, .chev, .ios-link.plus</div></td><td><div class="detail"><p><b>What’s wrong.</b> The interface mixes hand-drawn SVG, “＋”, “›”, “⌁”, “♕”, “◷”, and arrow text. Stroke weight and optical centring vary by component.</p><p><b>Recommended change.</b> Define an explicit symbol map and use consistent hierarchical rendering, scale, and weight.</p><p class="translation"><b>TRANSLATION RISK.</b> Replace with <code>Image(systemName:)</code> such as <code>house</code>, <code>dumbbell</code>, <code>chart.xyaxis.line</code>, <code>gearshape</code>, <code>plus</code>, <code>chevron.right</code>, <code>timer</code>, and <code>crown</code>. Source: <a href="https://developer.apple.com/design/human-interface-guidelines/sf-symbols">HIG SF Symbols</a>.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="Polish"><td class="finding-id">A5</td><td><div class="finding-title">Home summary cards are over-tall</div><div class="location">prototype/styles.css · .home-editorial-card; Home · “Your week”</div></td><td><div class="detail"><p><b>What’s wrong.</b> Each weekly summary card is at least 208 px and measured 246 px at compact runtime, placing roughly 500 px of secondary information ahead of anything below.</p><p><b>Recommended change.</b> Reduce these to compact 140–168 pt cards or a horizontally paged pair only if paging is discoverable; keep the workout card dominant.</p><p class="translation"><b>SwiftUI note.</b> Use adaptive <code>Grid</code> or <code>ViewThatFits</code>, not fixed heights; allow the copy to determine height at large text.</p></div></td><td><div class="priority"><span class="pill polish">Polish</span><span class="effort">Effort S</span></div></td></tr>
+          </tbody>
+          <tbody data-axis="B">
+            <tr class="axis-row"><td colspan="4">B · Interaction and motion — 3/5</td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">B1</td><td><div class="finding-title">Important editing remains gesture-only</div><div class="location">prototype/app.js · bind() [data-toggle-bests], [data-volume-longpress]; builderRows() .builder-drag-handle</div></td><td><div class="detail"><p><b>What’s wrong.</b> Personal-best tracking enters edit mode only after a 500 ms hold; per-muscle targets appear only after long press; builder reordering has hold/drag and keyboard arrows but no visible touch alternative.</p><p><b>Recommended change.</b> Add visible Edit actions, explicit move up/down actions, and keep context menus or drag as accelerators.</p><p class="translation"><b>SwiftUI note.</b> Use <code>EditButton</code>/<code>List.onMove</code>, visible <code>Button</code>s, and accessibility actions. A <code>contextMenu</code> may supplement, never replace, the visible route. Source: <a href="https://developer.apple.com/design/human-interface-guidelines/accessibility">HIG Accessibility</a>.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">B2</td><td><div class="finding-title">Navigation motion is CSS-authored</div><div class="location">prototype/styles.css · .transition-forward, .transition-back, .transition-tab, .transition-exercise-*; .sheet</div></td><td><div class="detail"><p><b>What’s wrong.</b> Whole-screen translate/fade animations and a custom sheet rise duplicate system navigation and presentation behavior. Reduce Motion is respected, but causality and interactive dismissal would be lost in a literal port.</p><p><b>Recommended change.</b> Keep custom motion only for set confirmation and exercise-to-exercise continuity; let navigation, tabs, alerts, and sheets use system transitions.</p><p class="translation"><b>TRANSLATION RISK.</b> Use <code>NavigationStack</code>, <code>TabView</code>, <code>.sheet</code>, and <code>confirmationDialog</code>; gate remaining animation with <code>accessibilityReduceMotion</code>.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">B3</td><td><div class="finding-title">Finish can silently discard a zero-set workout</div><div class="location">prototype/app.js · finishFlowSets(), cancelWorkout(); Live workout · Finish</div></td><td><div class="detail"><p><b>What’s wrong.</b> If no set has an outcome, tapping Finish calls <code>cancelWorkout()</code> immediately. There is no confirmation, undo, or explanation, even though elapsed time and any in-session edits are lost.</p><p><b>Recommended change.</b> Always present a confirmation: “End workout?” with Keep Working and Discard Workout; use destructive styling and preserve the draft until the choice resolves.</p><p class="translation"><b>SwiftUI note.</b> Use <code>confirmationDialog</code> with <code>Button(role: .destructive)</code>; restore focus to Finish on cancellation. Source: <a href="https://developer.apple.com/design/human-interface-guidelines/buttons">HIG Buttons</a>.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">B4</td><td><div class="finding-title">Web vibration is not a native haptic contract</div><div class="location">prototype/app.js · haptic(), logSet(), startRest(), saveSession()</div></td><td><div class="detail"><p><b>What’s wrong.</b> The prototype encodes haptics as millisecond vibration arrays. Those patterns do not map directly to iPhone haptic semantics and risk becoming noisy if copied conceptually.</p><p><b>Recommended change.</b> Define events, not waveforms: set logged, rest almost complete, rest complete, skipped, workout completed. Use success/selection/impact sparingly.</p><p class="translation"><b>TRANSLATION RISK.</b> Map events to <code>.sensoryFeedback(.selection)</code>, <code>.impact</code>, or <code>.success</code>; respect system haptic settings.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort S</span></div></td></tr>
+          </tbody>
+          <tbody data-axis="C">
+            <tr class="axis-row"><td colspan="4">C · Information architecture and flow — 2/5</td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">C1</td><td><div class="finding-title">Implemented product areas are unreachable</div><div class="location">prototype/app.js · profile(), goals(), bests(), progressPage(), editProfileSheet(); settings() and insights()</div></td><td><div class="detail"><p><b>What’s wrong.</b> Profile, goal management, the dedicated bests list, exercise drill-down, and profile editing exist in code, but Settings and Insights render no controls that reach them. <code>[data-edit-profile]</code> is bound but never rendered.</p><p><b>Recommended change.</b> Put Profile, Goals, and Data under Settings; make Personal Bests rows navigate to exercise progress; delete dead routes if they are not shipping.</p><p class="translation"><b>SwiftUI note.</b> Model destinations as typed <code>NavigationStack</code> values and add navigation tests for every route.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">C2</td><td><div class="finding-title">Workout completion has no summary</div><div class="location">prototype/app.js · saveSession(); transition from Live workout to Insights</div></td><td><div class="detail"><p><b>What’s wrong.</b> Saving clears the live session, switches tabs to Insights, and emits only “Workout saved.” The user never sees duration, volume, completed sets, PRs, skipped sets, or a clear Done action.</p><p><b>Recommended change.</b> Present a completion summary before returning to the app: session totals, PRs, notable progress, Share, and Done.</p><p class="translation"><b>SwiftUI note.</b> Present a focused summary with <code>NavigationStack</code> or <code>fullScreenCover</code>; use <code>ShareLink</code> for an optional result card.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">C3</td><td><div class="finding-title">First launch presents fabricated history</div><div class="location">prototype/app.js · state.workouts, state.sessions, state.goals; home(), workouts(), insights()</div></td><td><div class="detail"><p><b>What’s wrong.</b> A new state is seeded with seven completed sessions, goals, PRs, and a 4.9% strength gain. In production this would misrepresent user data and hide the true first-run experience.</p><p><b>Recommended change.</b> Start with a short setup: units, experience, optional template; then show honest empty states with one next action. Keep sample data only in preview/demo builds.</p><p class="translation"><b>SwiftUI note.</b> Gate setup with persisted onboarding state; use <code>ContentUnavailableView</code> for empty Home, Workouts, and Insights.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">C4</td><td><div class="finding-title">Collection and search empty states are absent</div><div class="location">prototype/app.js · workouts(), goals(), renderExercisePicker(); .picker-results</div></td><td><div class="detail"><p><b>What’s wrong.</b> Deleting all workouts or having no history/goals leaves blank sections. Runtime search for “zzzz” produced an empty sheet with filters and no message or recovery.</p><p><b>Recommended change.</b> Add scoped empty states: Create a Workout, Start Your First Session, Set a Goal, and “No exercises match” with Clear Filters.</p><p class="translation"><b>SwiftUI note.</b> Use <code>ContentUnavailableView.search(text:)</code> for no results and tailored <code>ContentUnavailableView</code> variants for empty collections.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">C5</td><td><div class="finding-title">Loading, error, offline, and conflict states are unmodelled</div><div class="location">prototype/app.js · state, localStorage reads/writes, data-export, data-restore-confirm; all data-backed screens</div></td><td><div class="detail"><p><b>What’s wrong.</b> Persistence failures are swallowed, restore is a placeholder, and no screen can show importing, retry, stale data, sync conflict, or partial recovery.</p><p><b>Recommended change.</b> Define a shared load state and explicit recovery copy for initial load, save failure, corrupt backup, offline restored data, and sync conflict. Never clear the current dataset until an import validates.</p><p class="translation"><b>SwiftUI note.</b> Use an observable store with explicit <code>idle/loading/loaded/failed</code> state and task cancellation; surface retry inline instead of generic alerts.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort L</span></div></td></tr>
+          </tbody>
+          <tbody data-axis="D">
+            <tr class="axis-row"><td colspan="4">D · Accessibility — 3/5</td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">D1</td><td><div class="finding-title">Rest countdown creates VoiceOver chatter</div><div class="location">prototype/app.js · liveScreen() .rest-countdown[aria-live="polite"], syncRestAction()</div></td><td><div class="detail"><p><b>What’s wrong.</b> The polite live region changes every second. Runtime exposed both the countdown and status toast live regions, so ongoing announcements can interrupt navigation and mask higher-value feedback.</p><p><b>Recommended change.</b> Keep the visual timer silent; announce only “Rest started, 90 seconds,” “10 seconds remaining,” and “Rest complete.” Expose the current value when the timer receives focus.</p><p class="translation"><b>SwiftUI note.</b> Use a non-live <code>Text(timerInterval:)</code>, <code>accessibilityValue</code>, and narrowly timed <code>AccessibilityNotification.Announcement</code>.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">D2</td><td><div class="finding-title">Decorative glyphs enter the accessibility tree</div><div class="location">prototype/app.js · settings() .glyph, workouts() .pr-badge/.chev, profile()/bests(); runtime Settings</div></td><td><div class="detail"><p><b>What’s wrong.</b> Runtime accessibility output included “☾”, “⌁”, “↑”, “↓”, and “›” in otherwise labelled rows. These add noise and can cause Voice Control ambiguity.</p><p><b>Recommended change.</b> Hide decoration; combine each icon, title, metadata, and state into one coherent row element. Keep meaningful values in labels or values, not symbol names.</p><p class="translation"><b>SwiftUI note.</b> Apply <code>.accessibilityHidden(true)</code> to decorative <code>Image</code>s and use <code>.accessibilityElement(children: .combine)</code> selectively.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort S</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">D3</td><td><div class="finding-title">The strength chart is exposed as a Slider</div><div class="location">prototype/app.js · insights() [data-chart-scrub][role="slider"], bindChartScrub()</div></td><td><div class="detail"><p><b>What’s wrong.</b> The chart is a time-series exploration surface but is announced as one scalar Slider. That hides the time dimension and implies the user is changing a value rather than inspecting data.</p><p><b>Recommended change.</b> Provide a concise trend summary and expose individual data points or an adjustable chart selection with date and value.</p><p class="translation"><b>TRANSLATION RISK.</b> Use Swift Charts with an accessible chart descriptor and <code>chartXSelection</code>; do not translate the HTML slider role literally.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort M</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">D4</td><td><div class="finding-title">System controls are visually imitated</div><div class="location">prototype/app.js · settings() .choice-control, [data-rest-toggle] .switch; liveScreen() .segmented; createSplit() .split-mode-control</div></td><td><div class="detail"><p><b>What’s wrong.</b> Theme, units, rest timers, live modes, and split modes use button groups or a decorative switch. ARIA is mostly present, but native focus, value announcements, Button Shapes, and On/Off Labels would have to be recreated.</p><p><b>Recommended change.</b> Preserve labels and grouping but replace each imitation with its semantic control.</p><p class="translation"><b>TRANSLATION RISK.</b> Use <code>Picker(.segmented)</code>, <code>Toggle</code>, and <code>TabView</code>; add concise <code>accessibilityLabel</code>/<code>Value</code> only where defaults are insufficient.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort M</span></div></td></tr>
+          </tbody>
+          <tbody data-axis="E">
+            <tr class="axis-row"><td colspan="4">E · Platform integration — 2/5</td></tr>
+            <tr class="finding-row" data-severity="Critical"><td class="finding-id">E1</td><td><div class="finding-title">Active workouts are not durable</div><div class="location">prototype/app.js · state.live/state.elapsed/state.rest, startWorkout(), logSet(), adjustActiveRest(), saveSession()</div></td><td><div class="detail"><p><b>What’s wrong.</b> Live session state exists only in memory. A reload or process termination removes the workout, set outcomes, edits, elapsed time, and rest timer; only workout templates and preferences are persisted.</p><p><b>Recommended change.</b> Persist the active session after every mutation, store absolute timestamps rather than decrement-only counters, recover on launch, and offer Resume or Discard.</p><p class="translation"><b>SwiftUI note.</b> Use SwiftData/Core Data for local-first durability, observe <code>scenePhase</code>, and derive elapsed/rest time from saved dates. Add migration and corruption recovery tests.</p></div></td><td><div class="priority"><span class="pill critical">Critical</span><span class="effort">Effort L</span></div></td></tr>
+            <tr class="finding-row" data-severity="High"><td class="finding-id">E2</td><td><div class="finding-title">Backup and restore are placeholders</div><div class="location">prototype/app.js · settings() [data-export]/[data-restore], bind() export toast, [data-restore-confirm]</div></td><td><div class="detail"><p><b>What’s wrong.</b> Export only reports a toast; restore ends with “File picker would open on iPhone.” There is no file validation, preview, progress, failure, cancellation, or success detail.</p><p><b>Recommended change.</b> Define a versioned document format, preview counts/date before replacement, validate before mutation, and keep a rollback snapshot.</p><p class="translation"><b>SwiftUI note.</b> Use <code>FileDocument</code>, <code>fileExporter</code>, <code>fileImporter</code>, and <code>ShareLink</code>; handle security-scoped URLs and malformed data.</p></div></td><td><div class="priority"><span class="pill high">High</span><span class="effort">Effort L</span></div></td></tr>
+            <tr class="finding-row" data-severity="Medium"><td class="finding-id">E3</td><td><div class="finding-title">Locale and layout direction are hard-coded</div><div class="location">prototype/index.html · html[lang="en"]; prototype/app.js · seeded date strings, string-built units and plurals; prototype/styles.css · left/right positioning</div></td><td><div class="detail"><p><b>What’s wrong.</b> Dates such as “Monday, 14 Sep,” unit strings, “1 exercises,” left/right positioning, and directional transitions are authored directly. No RTL state exists.</p><p><b>Recommended change.</b> Define the launch locale set, localize all strings and plurals, format dates/measurements, and use leading/trailing layout semantics.</p><p class="translation"><b>SwiftUI note.</b> Use String Catalogs, plural inflection, <code>Date.FormatStyle</code>, <code>Measurement</code>, and <code>LayoutDirection</code>; test an RTL locale. Source: <a href="https://developer.apple.com/design/human-interface-guidelines/layout">HIG Layout</a>.</p></div></td><td><div class="priority"><span class="pill medium">Medium</span><span class="effort">Effort M</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="additions">
+      <div class="section-head"><span class="section-num">06 / ADDITIONS</span><h2>Ranked by impact ÷ effort</h2></div>
+      <p class="lede">These are additions beyond the current prototype. Ranking favours changes that reduce workout interruption and decision friction before broader ecosystem features.</p>
+      <div class="additions">
+        <article class="panel addition"><div class="rank">01</div><div><h3>Live rest status outside the app</h3><p><b>Problem.</b> People lock the phone or switch apps between sets and can miss rest completion. <b>Location.</b> Lock Screen, Dynamic Island, and optional local notification.</p></div><div class="native"><b>SwiftUI approach.</b> ActivityKit Live Activity backed by absolute rest-end time; local notification fallback; actions to Skip or +15 s through App Intents.</div><div class="effort-box"><strong>M</strong><span>High impact</span></div></article>
+        <article class="panel addition"><div class="rank">02</div><div><h3>First-run workout setup</h3><p><b>Problem.</b> An empty new account needs a fast path to a credible first workout without fabricated history. <b>Location.</b> First launch, then Settings → Training setup.</p></div><div class="native"><b>SwiftUI approach.</b> Short <code>NavigationStack</code> flow for units, experience, days, and template; skip is always available; end in an honest <code>ContentUnavailableView</code>.</div><div class="effort-box"><strong>M</strong><span>High impact</span></div></article>
+        <article class="panel addition"><div class="rank">03</div><div><h3>Completion summary and share card</h3><p><b>Problem.</b> Finishing lacks closure and makes PRs hard to notice. <b>Location.</b> Immediately after Save.</p></div><div class="native"><b>SwiftUI approach.</b> Summary screen with duration, volume, PRs, skipped sets, recovery note, Done, and optional <code>ShareLink</code> using a rendered privacy-safe card.</div><div class="effort-box"><strong>M</strong><span>High impact</span></div></article>
+        <article class="panel addition"><div class="rank">04</div><div><h3>Resume and start App Intents</h3><p><b>Problem.</b> Starting the common workout or returning to an interrupted session requires opening and navigating the app. <b>Location.</b> Shortcuts, Siri, Spotlight, Action button, Control Center.</p></div><div class="native"><b>SwiftUI approach.</b> <code>AppIntent</code> for Start Workout and Resume Workout with <code>AppEntity</code> workout selection and deep links.</div><div class="effort-box"><strong>M</strong><span>Medium-high impact</span></div></article>
+        <article class="panel addition"><div class="rank">05</div><div><h3>Next-workout and weekly-progress widgets</h3><p><b>Problem.</b> Users need the next action and weekly status without entering the app. <b>Location.</b> Home Screen and Lock Screen widgets.</p></div><div class="native"><b>SwiftUI approach.</b> WidgetKit timeline from the shared durable store; small widget starts/resumes, medium widget adds weekly progress.</div><div class="effort-box"><strong>M</strong><span>Medium impact</span></div></article>
+        <article class="panel addition"><div class="rank">06</div><div><h3>iCloud sync with explicit conflict handling</h3><p><b>Problem.</b> Workout plans and history should survive device replacement and work across iPhone/iPad. <b>Location.</b> Invisible by default; status and recovery under Settings → Data.</p></div><div class="native"><b>SwiftUI approach.</b> SwiftData/Core Data with CloudKit, local-first writes, deterministic merge rules, last-sync status, and an export escape hatch.</div><div class="effort-box"><strong>L</strong><span>High impact</span></div></article>
+        <article class="panel addition"><div class="rank">07</div><div><h3>Actionable training reminders</h3><p><b>Problem.</b> Planned training days and unfinished sessions are easy to forget. <b>Location.</b> Settings → Notifications and notification actions.</p></div><div class="native"><b>SwiftUI approach.</b> UserNotifications with granular opt-in, scheduled-day reminders, Resume action, and no engagement spam.</div><div class="effort-box"><strong>M</strong><span>Medium impact</span></div></article>
+        <article class="panel addition"><div class="rank">08</div><div><h3>Spotlight exercise and workout search</h3><p><b>Problem.</b> Larger libraries make in-app browsing slower. <b>Location.</b> System Spotlight and deep-linked results.</p></div><div class="native"><b>SwiftUI approach.</b> Index workouts and exercises with Core Spotlight; deep link into workout detail or exercise progress.</div><div class="effort-box"><strong>S</strong><span>Lower impact</span></div></article>
+      </div>
+      <aside class="panel not-recommending">
+        <h3>Deliberately not recommending</h3>
+        <ul>
+          <li><b>Social feed or leaderboards:</b> adds moderation, comparison pressure, and product sprawl without improving the logging loop.</li>
+          <li><b>AI-generated coaching:</b> introduces safety and trust risk before the underlying training data and completion states are reliable.</li>
+          <li><b>Apple Watch logging in the first release:</b> high interaction and sync complexity; validate the durable iPhone flow first.</li>
+          <li><b>HealthKit strength prescriptions:</b> the data model and user benefit are not yet specific enough to justify permissions and privacy cost.</li>
+          <li><b>Competitive streaks:</b> can encourage training through poor recovery; weekly consistency and goals already cover the useful signal.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="roadmap">
+      <div class="section-head"><span class="section-num">07 / ROADMAP</span><h2>Three waves</h2></div>
+      <div class="roadmap">
+        <article class="panel wave"><span class="wave-num">Wave 1</span><h3>Ship-blockers</h3><ul><li>E1 durable active-session persistence and recovery</li><li>A1 contrast corrections and semantic colour assets</li><li>B1 visible alternatives for every long press and drag</li><li>C1 reachable Profile, Goals, Bests, and progress routes</li><li>D1 timer announcement redesign</li><li>D2 decorative accessibility cleanup</li><li>B3 safe Finish confirmation</li></ul></article>
+        <article class="panel wave"><span class="wave-num">Wave 2</span><h3>Next</h3><ul><li>Native TabView, NavigationStack, sheets, dialogs, controls, and SF Symbols</li><li>Full Dynamic Type and Bold Text matrix</li><li>First-run and all empty/loading/error/offline states</li><li>Workout completion summary</li><li>Versioned export and restore</li><li>String Catalog, locale formatting, and RTL testing</li></ul></article>
+        <article class="panel wave"><span class="wave-num">Wave 3</span><h3>Later</h3><ul><li>Live Activity and rest notifications</li><li>App Intents and Control Center entry points</li><li>WidgetKit surfaces</li><li>iCloud sync and conflict recovery</li><li>Spotlight indexing</li><li>Optional sharing and Handoff after privacy review</li></ul></article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="section-num">08 / EVIDENCE</span><h2>Method and sources</h2></div>
+      <div class="panel sources">
+        <p><b>Static evidence:</b> <code>prototype/index.html</code>, <code>prototype/app.js</code>, <code>prototype/styles.css</code>, <code>docs/screen-inventory.md</code>, <code>docs/design-tokens.md</code>, and <code>docs/swiftui-handoff.md</code>.</p>
+        <p><b>Runtime evidence:</b> 375 × 812 pt; Home, Workouts, empty Builder, Exercise Picker, search no-results, Insights, Live Exercise, Rest, Finish dialog, Settings; default and <code>?text=accessibility</code>. Core controls met 44 × 44 pt in sampled routes; no horizontal overflow was observed. Native VoiceOver, Voice Control, Switch Control, Bold Text, accessibility1–5, landscape safe areas, and device interruption remain unverified until a SwiftUI build exists.</p>
+        <p><b>Apple references:</b> <a href="https://developer.apple.com/design/human-interface-guidelines/">Human Interface Guidelines</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/accessibility">Accessibility</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/layout">Layout</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/typography">Typography</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/dark-mode">Dark Mode</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/tab-bars">Tab bars</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/sheets">Sheets</a>; <a href="https://developer.apple.com/design/human-interface-guidelines/buttons">Buttons</a>; <a href="https://developer.apple.com/documentation/swiftui/accessibility-fundamentals">SwiftUI accessibility fundamentals</a>.</p>
+        <p><b>Boundary:</b> This review assesses design quality and native translation risk. It does not guarantee App Store approval. Minimum iOS is specified as 26; exact supported iPhone models, orientation policy, and launch locales still require product decisions.</p>
+      </div>
+    </section>
+
+    <footer>Sevro iOS product design review · 21 September 2026 · Offline self-contained report</footer>
+  </main>
+
+  <script>
+    (() => {
+      const buttons = [...document.querySelectorAll('[data-filter]')];
+      const rows = [...document.querySelectorAll('.finding-row')];
+      const count = document.querySelector('.result-count');
+      const apply = value => {
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === value)));
+        rows.forEach(row => { row.hidden = value !== 'all' && row.dataset.severity !== value; });
+        document.querySelectorAll('tbody[data-axis]').forEach(group => {
+          const visible = [...group.querySelectorAll('.finding-row')].some(row => !row.hidden);
+          group.querySelector('.axis-row').hidden = !visible;
+        });
+        const visibleCount = rows.filter(row => !row.hidden).length;
+        count.textContent = `${visibleCount} finding${visibleCount === 1 ? '' : 's'}`;
+      };
+      buttons.forEach(button => button.addEventListener('click', () => apply(button.dataset.filter)));
+    })();
+  </script>
+</body>
+</html>
