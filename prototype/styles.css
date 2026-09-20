@@ -860,14 +860,20 @@ html[data-theme="dark"] .workout-exercise-card { border-color:rgba(255,255,255,.
 .remove-circle::before {
   content:"";
   position:absolute;
+  top:50%;
+  left:50%;
   width:27px;
   height:27px;
   border-radius:50%;
   background:var(--red);
+  transform:translate(-50%,-50%);
 }
 .remove-circle::after {
   content:"−";
-  position:relative;
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
   color:#fff;
   font-size:22px;
   line-height:1;
