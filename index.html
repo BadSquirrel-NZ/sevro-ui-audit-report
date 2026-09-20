@@ -88,7 +88,7 @@
     <div class="wrap">
       <p class="eyebrow">Apple iOS design audit · 20 September 2026</p>
       <h1>Sevro interactive prototype</h1>
-      <p class="lede">A screen-by-screen HIG, accessibility, Dynamic Type, Dark Mode, navigation, and App Review readiness assessment of the latest local prototype.</p>
+      <p class="lede">A screen-by-screen HIG, accessibility, Dynamic Type, Dark Mode, navigation, and App Review readiness assessment of the latest local prototype, with a remediation implementation log.</p>
       <div class="meta">
         <span class="pill">Revision 550d784 + local UI changes</span>
         <span class="pill">Apple sources verified 2026-09-20</span>
@@ -100,6 +100,16 @@
   <main class="wrap">
     <section>
       <div class="notice"><strong>Scope boundary.</strong> This repository contains a web behavioural prototype, not the production SwiftUI app. Runtime findings apply to the prototype. Native-only behavior—VoiceOver focus in SwiftUI, system sheets, real Dynamic Type categories, SF Symbol availability, haptics, and App Store metadata—remains unverified until the production app is audited. This report does not guarantee App Store approval.</div>
+    </section>
+
+    <section aria-labelledby="remediation-title">
+      <h2 id="remediation-title">Remediation implementation log</h2>
+      <div class="notice"><strong>Applied in the current prototype checkout.</strong> The actionable web-prototype findings are implemented in <code>prototype/app.js</code>, <code>prototype/styles.css</code>, and <code>prototype/index.html</code>. The native production contract is recorded in <code>docs/swiftui-handoff.md</code>; device-only checks remain intentionally open.</div>
+      <div class="screen-grid">
+        <article class="screen"><h3>Accessibility behavior</h3><ul><li>Light Mode Insights number now uses the semantic text role.</li><li>Sheets/dialogs move focus, trap Tab, close on Escape, and restore focus.</li><li>App shell is inert while an overlay is open.</li><li>Announcements use a hidden atomic status region.</li><li>Theme, volume, units, and zone controls expose pressed state.</li><li>Standard split action has a 44 px minimum target.</li></ul></article>
+        <article class="screen"><h3>Adaptive presentation</h3><ul><li>Landscape uses the available width with an adaptive two-column composition.</li><li>Increase Contrast strengthens borders and surfaces.</li><li>Reduce Transparency removes blur and uses opaque surfaces.</li><li>Home navigation uses the outlined house symbol treatment.</li></ul></article>
+        <article class="screen"><h3>Native handoff contract</h3><ul><li>Semantic SwiftUI colors and native presentations are required.</li><li>Dynamic Type, Bold Text, assistive technologies, localization/RTL, and App Review metadata remain release checks.</li><li>Deployment target, device scope, locales, and orientation policy still need product decisions.</li></ul></article>
+      </div>
     </section>
 
     <section aria-labelledby="summary-title">
