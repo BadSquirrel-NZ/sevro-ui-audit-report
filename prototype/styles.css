@@ -285,7 +285,7 @@ p { line-height: 1.45; }
 .chart-line { fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
 .chart-area { fill:url(#area); opacity:.24; }
 .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.stat { padding:14px 11px; }
+.stat { display:flex; min-height:72px; padding:12px 8px; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
 .stat strong { display:block; margin-top:5px; font-size:16px; }
 .stat span { color:var(--muted); font-size:11px; }
 .builder-row { overflow:clip; padding:16px; -webkit-touch-callout:none; transition:transform .27s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,background .2s ease; }
