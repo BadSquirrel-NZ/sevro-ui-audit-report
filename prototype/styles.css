@@ -303,7 +303,7 @@ p { line-height: 1.45; }
 .empty-builder p { margin:8px auto 18px; max-width:300px; }
 .empty-builder .secondary { width:100%; margin-top:9px; }
 .builder-controls { display:flex; align-items:center; gap:8px; margin-top:14px; }
-.builder-controls .counter { flex-basis:156px; width:156px; }
+.builder-controls .counter { flex-basis:164px; width:164px; padding-right:10px; }
 .counter { display:flex; flex:0 0 136px; align-items:center; justify-content:space-between; gap:8px; width:136px; box-sizing:border-box; padding:4px; border-radius:13px; background:var(--surface-2); }
 .counter button { width:34px; height:34px; border:0; border-radius:10px; background:var(--surface-3); }
 .counter span { width:40px; min-width:40px; text-align:center; font-weight:750; }
